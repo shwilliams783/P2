@@ -129,6 +129,7 @@ void mvars()
 
 void stats()
 {
+	std::cout<<"stats()"<<std::endl; /* Remove after debugging */
 	stat();
 	//mstat();
 	return;
@@ -136,44 +137,155 @@ void stats()
 
 void stat()
 {
+	std::cout<<"stat()"<<std::endl; /* Remove after debugging */
 	if(tk.id == readTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//in();
+		in();
 		return;
 	}
 	else if(tk.id == prntTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//out();
+		out();
 		return;
 	}
 	else if(tk.id == iffTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//ifFunc();
+		ifFunc();
 		return;
 	}
 	else if(tk.id == iterTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//loop();
+		loop();
 		return;
 	}
 	else if(tk.id == letTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//assign();
+		assign();
 		return;
 	}
 	else
 		parseError(13, tk.line);
 	
+}
+
+void in()
+{
+	std::cout<<"in()"<<std::endl; /* Remove after debugging */
+	if(tk.id == IDTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		if(tk.id == pdTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			return;
+		}
+		else
+			parseError(23, tk.line);
+	}
+	else
+		parseError(1, tk.line);
+}
+
+void out()
+{
+	std::cout<<"out()"<<std::endl; /* Remove after debugging */
+	//expr();
+	if(tk.id == pdTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		return;
+	}
+	else
+		parseError(23, tk.line);
+}
+
+void ifFunc()
+{
+	std::cout<<"ifFunc()"<<std::endl; /* Remove after debugging */
+	if(tk.id == lpTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//expr();
+		//RO();
+		//expr();
+		if(tk.id == rpTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			stat();
+			return;
+		}
+		else
+			parseError(25, tk.line);
+	}
+	else
+		parseError(24, tk.line);
+}
+
+void loop()
+{
+	std::cout<<"loop()"<<std::endl; /* Remove after debugging */
+	if(tk.id == lpTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//expr();
+		//RO();
+		//expr();
+		if(tk.id == rpTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			stat();
+			return;
+		}
+		else
+			parseError(25, tk.line);
+	}
+	else
+		parseError(24, tk.line);
+}
+
+void assign()
+{
+	std::cout<<"assign()"<<std::endl; /* Remove after debugging */
+	if(tk.id == IDTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		if(tk.id == eqTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			//expr();
+			if(tk.id == pdTK)
+			{
+				std::cout<<tk.name<< std::endl; /* Remove after debugging */
+				tk = scanner();
+				return;
+			}
+			else
+				parseError(23, tk.line);
+		}
+		else
+			parseError(14, tk.line);
+	}
+	else
+		parseError(1, tk.line);
 }
 
 void parseError(int errCode, int line)
