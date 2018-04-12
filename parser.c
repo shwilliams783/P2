@@ -49,7 +49,7 @@ void block()
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		vars();
-		//stats();
+		stats();
 		if(tk.id == stopTK)
 		{
 			std::cout<<tk.name<< std::endl; /* Remove after debugging */
@@ -125,6 +125,55 @@ void mvars()
 	{
 		parseError(17, tk.line);
 	}
+}
+
+void stats()
+{
+	stat();
+	//mstat();
+	return;
+}
+
+void stat()
+{
+	if(tk.id == readTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//in();
+		return;
+	}
+	else if(tk.id == prntTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//out();
+		return;
+	}
+	else if(tk.id == iffTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//ifFunc();
+		return;
+	}
+	else if(tk.id == iterTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//loop();
+		return;
+	}
+	else if(tk.id == letTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		//assign();
+		return;
+	}
+	else
+		parseError(13, tk.line);
+	
 }
 
 void parseError(int errCode, int line)

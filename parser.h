@@ -9,6 +9,8 @@ void program();
 void block();
 void vars();
 void mvars();
+void stats();
+void stat();
 void parseError(int, int);
 
 #endif
