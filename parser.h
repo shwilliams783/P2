@@ -11,6 +11,11 @@ void vars();
 void mvars();
 void stats();
 void stat();
+void in();
+void out();
+void ifFunc();
+void loop();
+void assign();
 void parseError(int, int);
 
 #endif
