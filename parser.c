@@ -20,10 +20,12 @@ void parser()
 	tk = scanner();
 	program();
 	std::cout<<"Program complete, expecting EOFTK."<<std::endl; /* Remove after debugging */
-	if(tk.id == EOFTK);
+	if(tk.id == EOFTK)
+	{
+		return;
+	}
 	else
 		parseError(32, tk.line);
-	return;
 }
 
 void program()
@@ -122,17 +124,93 @@ void mvars()
 			parseError(1, tk.line);
 	}
 	else
-	{
 		parseError(17, tk.line);
+}
+
+void expr()
+{
+	std::cout<<"expr()"<<std::endl; /* Remove after debugging */
+	M();
+	if(tk.id == plTK || tk.id == miTK || tk.id == fsTK || tk.id == stTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		expr();
+		return;
 	}
+	else
+		return;
+}
+
+void M()
+{
+	std::cout<<"M()"<<std::endl; /* Remove after debugging */
+	if(tk.id == modTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		M();
+		return;
+	}
+	else
+	{
+		R();
+		return;
+	}
+}
+
+void R()
+{
+	std::cout<<"R()"<<std::endl; /* Remove after debugging */
+	if(tk.id == lpTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		expr();
+		if(tk.id == rpTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			return;
+		}
+		else
+			parseError(25, tk.line);
+	}
+	else if(tk.id == IDTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		return;
+	}
+	else if(tk.id == IntTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		return;
+	}
+	else
+		parseError(0, tk.line);
 }
 
 void stats()
 {
 	std::cout<<"stats()"<<std::endl; /* Remove after debugging */
 	stat();
-	//mstat();
+	mstat();
 	return;
+}
+
+void mstat()
+{
+	std::cout<<"mstat()"<<std::endl; /* Remove after debugging */
+	if(tk.id == readTK || tk.id == prntTK || tk.id == starTK || tk.id == iffTK || tk.id == iterTK || tk.id == letTK)
+	{
+		stat();
+		mstat();
+		return;
+	}
+	else
+		return;
 }
 
 void stat()
@@ -150,6 +228,11 @@ void stat()
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		out();
+		return;
+	}
+	else if(tk.id == starTK)
+	{
+		block();
 		return;
 	}
 	else if(tk.id == iffTK)
@@ -201,7 +284,7 @@ void in()
 void out()
 {
 	std::cout<<"out()"<<std::endl; /* Remove after debugging */
-	//expr();
+	expr();
 	if(tk.id == pdTK)
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
@@ -219,9 +302,9 @@ void ifFunc()
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//expr();
-		//RO();
-		//expr();
+		expr();
+		RO();
+		expr();
 		if(tk.id == rpTK)
 		{
 			std::cout<<tk.name<< std::endl; /* Remove after debugging */
@@ -243,9 +326,9 @@ void loop()
 	{
 		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
-		//expr();
-		//RO();
-		//expr();
+		expr();
+		RO();
+		expr();
 		if(tk.id == rpTK)
 		{
 			std::cout<<tk.name<< std::endl; /* Remove after debugging */
@@ -271,7 +354,7 @@ void assign()
 		{
 			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
-			//expr();
+			expr();
 			if(tk.id == pdTK)
 			{
 				std::cout<<tk.name<< std::endl; /* Remove after debugging */
@@ -286,6 +369,52 @@ void assign()
 	}
 	else
 		parseError(1, tk.line);
+}
+
+void RO()
+{
+	std::cout<<"RO()"<<std::endl; /* Remove after debugging */
+	if(tk.id == ltTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		if(tk.id == ltTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			return;
+		}
+		else
+			return;
+	}
+	else if(tk.id == gtTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		if(tk.id == gtTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			return;
+		}
+		else
+			return;
+	}
+	else if(tk.id == eqTK)
+	{
+		std::cout<<tk.name<< std::endl; /* Remove after debugging */
+		tk = scanner();
+		if(tk.id == eqTK)
+		{
+			std::cout<<tk.name<< std::endl; /* Remove after debugging */
+			tk = scanner();
+			return;
+		}
+		else
+			return;
+	}
+	else
+		parseError(14, tk.line);
 }
 
 void parseError(int errCode, int line)
