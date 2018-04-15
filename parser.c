@@ -11,7 +11,7 @@
 
 extern FILE *infp;
 extern token tk;
-static int currentDepth = 0;
+static int currentDepth = -1;
 
 static const int BUFFER = 80;
 static char errmsg[BUFFER];
