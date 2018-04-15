@@ -36,6 +36,7 @@ struct token{
 	{
 		id = IntTK;
 		line = 1;
+		str = "NULL";
 	}
 
 	tokenType id;

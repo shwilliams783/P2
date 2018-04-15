@@ -7,6 +7,7 @@
 #include "scanner.h"
 #include "parser.h"
 #include "node.h"
+#include "testTree.h"
 
 static const int BUFFER = 80; 
 FILE *infp;
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
 	inputValidation(argc, argv);
 	/* Initializes the parser */
 	root = parser();
-	
+	traversePreorder(root);
 }
 
 /* inputValidation() validates command line arguments and sets the file pointer
