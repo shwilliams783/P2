@@ -16,15 +16,15 @@ static int currentDepth = 0;
 static const int BUFFER = 80;
 static char errmsg[BUFFER];
 
+/* parser() creates a node that initializes the parser and tree builder with a
+   root node of depth 0. */
 node_t* parser()
 {
 	node_t* root = new node_t;
 	root->depth = currentDepth;
 	
-	std::cout<<"parser()"<<std::endl; /* Remove after debugging */
 	tk = scanner();
 	root = program();
-	std::cout<<"Program complete, expecting EOFTK."<<std::endl; /* Remove after debugging */
 	if(tk.id == EOFTK)
 	{
 		currentDepth--;
@@ -34,15 +34,15 @@ node_t* parser()
 		parseError(32, tk.line);
 }
 
+/* program() creates a node that recognizes input file as a program with the
+   keyword "Program" and calls vars() and block().*/
 node_t* program()
 {
 	currentDepth++;
 	node_t* p = genNode(progND, currentDepth);
 	
-	std::cout<<"program()"<<std::endl; /* Remove after debugging */
 	if(tk.id == progTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = vars();
 		p->child1 = block();
@@ -53,21 +53,21 @@ node_t* program()
 		parseError(9, tk.line);
 }
 
+/* block() creates a node that recognizes blocks of code, beginning with
+   "start" and ending with "stop". Within the block, vars() and stats()
+   are called. */
 node_t* block()
 {
 	currentDepth++;
 	node_t* p = genNode(blocND, currentDepth);
 	
-	std::cout<<"block()"<<std::endl; /* Remove after debugging */
 	if(tk.id == starTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = vars();
 		p->child1 = stats();
 		if(tk.id == stopTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -79,28 +79,27 @@ node_t* block()
 		parseError(7, tk.line);
 }
 
+
+/* vars() creates a node that is either empty, or initializes an Identifier to
+   a given Integer value, both of which are stored as tokens. After
+   initialization, mvars() is called. */
 node_t* vars()
 {
 	currentDepth++;
 	node_t* p = genNode(varsND, currentDepth);
 	
-	std::cout<<"vars()"<<std::endl; /* Remove after debugging */
 	if(tk.id == varTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		if(tk.id == IDTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			p->tokens[0] = tk;
 			tk = scanner();
 			if(tk.id == eqTK)
 			{
-				std::cout<<tk.name<< std::endl; /* Remove after debugging */
 				tk = scanner();
 				if(tk.id == IntTK)
 				{
-					std::cout<<tk.name<< std::endl; /* Remove after debugging */
 					p->tokens[1] = tk;
 					tk = scanner();
 					p->child0 = mvars();
@@ -120,26 +119,25 @@ node_t* vars()
 		return p;
 }
 
+/* mvars() creates a node that is either empty, after recognizing a period
+   token, or recognizes a colon token, then creates an Identifier, which is
+   stored as a token. After initialization, mvars() is called again. */
 node_t* mvars()
 {
 	currentDepth++;
 	node_t* p = genNode(mvarND, currentDepth);
 	
-	std::cout<<"mvars()"<<std::endl; /* Remove after debugging */
 	if(tk.id == pdTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		currentDepth--;
 		return p;		
 	}
 	else if(tk.id = colTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		if(tk.id == IDTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			p->tokens[0] = tk;
 			tk = scanner();
 			p->child0 = mvars();
@@ -153,17 +151,19 @@ node_t* mvars()
 		parseError(17, tk.line);
 }
 
+/* expr() creates a node that either contains an arithmetic operation (+-/*)
+   between an M() node and another expr() node, or converts directly to an M()
+   node. Arithmetic operations convert the node type from expr to either add, 
+   sub, div, or mult.*/
 node_t* expr()
 {
 	currentDepth++;
 	node_t* p = genNode(exprND, currentDepth);
 	
-	std::cout<<"expr()"<<std::endl; /* Remove after debugging */
 	p->child0 = M();
 	if(tk.id == plTK)
 	{
 		p->type = addND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child1 = expr();
 		currentDepth--;
@@ -172,7 +172,6 @@ node_t* expr()
 	else if(tk.id == miTK)
 	{
 		p->type = subND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child1 = expr();
 		currentDepth--;
@@ -181,7 +180,6 @@ node_t* expr()
 	else if(tk.id == fsTK)
 	{
 		p->type = divND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child1 = expr();
 		currentDepth--;
@@ -190,7 +188,6 @@ node_t* expr()
 	else if(tk.id == stTK)
 	{
 		p->type = multND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child1 = expr();
 		currentDepth--;
@@ -203,15 +200,15 @@ node_t* expr()
 	}
 }
 
+/* M() creates a node that either contains a modulus "%" token and another M()
+   node, or converts to an R() node. */
 node_t* M()
 {
 	currentDepth++;
 	node_t* p = genNode(MND, currentDepth);
 	
-	std::cout<<"M()"<<std::endl; /* Remove after debugging */
 	if(tk.id == modTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = M();
 		currentDepth--;
@@ -225,20 +222,19 @@ node_t* M()
 	}
 }
 
+/* R() creates a node that either contains an expr() node surrounded by
+   parenthesis, or stores an identifier token, or stores an integer token*/
 node_t* R()
 {
 	currentDepth++;
 	node_t* p = genNode(RND, currentDepth);
 	
-	std::cout<<"R()"<<std::endl; /* Remove after debugging */
 	if(tk.id == lpTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = expr();
 		if(tk.id == rpTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -248,7 +244,6 @@ node_t* R()
 	}
 	else if(tk.id == IDTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		p->tokens[0] = tk;
 		tk = scanner();
 		currentDepth--;
@@ -256,7 +251,6 @@ node_t* R()
 	}
 	else if(tk.id == IntTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		p->tokens[0] = tk;
 		tk = scanner();
 		currentDepth--;
@@ -266,24 +260,26 @@ node_t* R()
 		parseError(0, tk.line);
 }
 
+/* stats() creates a node that creates a stat() node and mstat() node. */
 node_t* stats()
 {
 	currentDepth++;
 	node_t* p = genNode(stsND, currentDepth);
 	
-	std::cout<<"stats()"<<std::endl; /* Remove after debugging */
 	p->child0 = stat();
 	p->child1 = mstat();
 	currentDepth--;
 	return p;
 }
 
+/* mstat() creates either an empty node, or a node that creates a stat() node
+   and another mstat() node. The stat() node requires the next token to be
+   any of the following: {readTK, prntTK, starTK, iffTK, iterTK, letTK}.*/
 node_t* mstat()
 {
 	currentDepth++;
 	node_t* p = genNode(mstND, currentDepth);
 	
-	std::cout<<"mstat()"<<std::endl; /* Remove after debugging */
 	if(tk.id == readTK || tk.id == prntTK || tk.id == starTK || tk.id == iffTK || tk.id == iterTK || tk.id == letTK)
 	{
 		p->child0 = stat();
@@ -298,15 +294,17 @@ node_t* mstat()
 	}
 }
 
+/* stat() creates a node that requires the next token to be any of the
+   following: {readTK, prntTK, starTK, iffTK, iterTK, letTK}. stat() creates a
+   corresponding new node to handle the given token:
+   {in(), out(), block(), ifFunc(), loop(), assign()}.   */
 node_t* stat()
 {
 	currentDepth++;
 	node_t* p = genNode(statND, currentDepth);
 	
-	std::cout<<"stat()"<<std::endl; /* Remove after debugging */
 	if(tk.id == readTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = in();
 		currentDepth--;
@@ -314,7 +312,6 @@ node_t* stat()
 	}
 	else if(tk.id == prntTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = out();
 		currentDepth--;
@@ -328,7 +325,6 @@ node_t* stat()
 	}
 	else if(tk.id == iffTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = ifFunc();
 		currentDepth--;
@@ -336,7 +332,6 @@ node_t* stat()
 	}
 	else if(tk.id == iterTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = loop();
 		currentDepth--;
@@ -344,7 +339,6 @@ node_t* stat()
 	}
 	else if(tk.id == letTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = assign();
 		currentDepth--;
@@ -355,20 +349,18 @@ node_t* stat()
 	
 }
 
+/* in() creates a node that stores an identifier token.*/
 node_t* in()
 {
 	currentDepth++;
 	node_t* p = genNode(inND, currentDepth);
 	
-	std::cout<<"in()"<<std::endl; /* Remove after debugging */
 	if(tk.id == IDTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		p->tokens[0] = tk;
 		tk = scanner();
 		if(tk.id == pdTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -380,16 +372,15 @@ node_t* in()
 		parseError(1, tk.line);
 }
 
+/* out() creates a node that creates an expr() node.*/
 node_t* out()
 {
 	currentDepth++;
 	node_t* p = genNode(outND, currentDepth);
 	
-	std::cout<<"out()"<<std::endl; /* Remove after debugging */
 	p->child0 = expr();
 	if(tk.id == pdTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		currentDepth--;
 		return p;
@@ -398,22 +389,21 @@ node_t* out()
 		parseError(23, tk.line);
 }
 
+/* ifFunc() creates a node that creates 3 nodes contained within parenthesis,
+   (expr(), RO(), expr()), followed by a fourth node, stat(). */
 node_t* ifFunc()
 {
 	currentDepth++;
 	node_t* p = genNode(iffND, currentDepth);
 	
-	std::cout<<"ifFunc()"<<std::endl; /* Remove after debugging */
 	if(tk.id == lpTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = expr();
 		p->child1 = RO();
 		p->child2 = expr();
 		if(tk.id == rpTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			p->child3 = stat();
 			currentDepth--;
@@ -426,22 +416,21 @@ node_t* ifFunc()
 		parseError(24, tk.line);
 }
 
+/* loop() creates a node that creates 3 nodes contained within parenthesis,
+   (expr(), RO(), expr()), followed by a fourth node, stat(). */
 node_t* loop()
 {
 	currentDepth++;
 	node_t* p = genNode(loopND, currentDepth);
 	
-	std::cout<<"loop()"<<std::endl; /* Remove after debugging */
 	if(tk.id == lpTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		p->child0 = expr();
 		p->child1 = RO();
 		p->child2 = expr();
 		if(tk.id == rpTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			p->child3 = stat();
 			currentDepth--;
@@ -454,25 +443,23 @@ node_t* loop()
 		parseError(24, tk.line);
 }
 
+/* assign() creates a node that stores an identifer, checks for an equal
+   "=" token, then creates an expr() node.*/
 node_t* assign()
 {
 	currentDepth++;
 	node_t* p = genNode(asgnND, currentDepth);
 	
-	std::cout<<"assign()"<<std::endl; /* Remove after debugging */
 	if(tk.id == IDTK)
 	{
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		p->tokens[0] = tk;
 		tk = scanner();
 		if(tk.id == eqTK)
 		{
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			p->child0 = expr();
 			if(tk.id == pdTK)
 			{
-				std::cout<<tk.name<< std::endl; /* Remove after debugging */
 				tk = scanner();
 				currentDepth--;
 				return p;
@@ -487,21 +474,22 @@ node_t* assign()
 		parseError(1, tk.line);
 }
 
+/* RO() creates a node that neither creates any further nodes, nor does it
+   store any tokens. Instead, the RO() node changes its type to one of the
+   following: {ltND, leND, gtND, geND, eqND, eqeqND}, depending on the tokens
+   that are scanned.*/
 node_t* RO()
 {
 	currentDepth++;
 	node_t* p = genNode(ROND, currentDepth);
 	
-	std::cout<<"RO()"<<std::endl; /* Remove after debugging */
 	if(tk.id == ltTK)
 	{
 		p->type = ltND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		if(tk.id == ltTK)
 		{
 			p->type = leND;
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -515,12 +503,10 @@ node_t* RO()
 	else if(tk.id == gtTK)
 	{
 		p->type = gtND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		if(tk.id == gtTK)
 		{
 			p->type = geND;
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -534,12 +520,10 @@ node_t* RO()
 	else if(tk.id == eqTK)
 	{
 		p->type = eqND;
-		std::cout<<tk.name<< std::endl; /* Remove after debugging */
 		tk = scanner();
 		if(tk.id == eqTK)
 		{
 			p->type = eqeqND;
-			std::cout<<tk.name<< std::endl; /* Remove after debugging */
 			tk = scanner();
 			currentDepth--;
 			return p;
@@ -554,18 +538,19 @@ node_t* RO()
 		parseError(14, tk.line);
 }
 
+/* genNode() creates a new node with the given node type and node depth */
 node_t* genNode(int type, int depth)
 {
-	std::cout<<"genNode "<<type<<" "<<depth<<std::endl;
 	node_t* node = new node_t;
 	node->type = (nodeType)type;
 	node->depth = depth;
 	return node;
 }
 
+/* parseError() displays an error message containing the line number where the
+   syntax error was found, and what token was expected */
 void parseError(int errCode, int line)
 {
-	snprintf(errmsg, sizeof(errmsg), "Line %d: ERROR MESSAGE PLACE HOLDER #%d.", line, errCode);
-	perror(errmsg);
+	std::cerr<<"Error: line "<<line<<", expected "<<tokNames[errCode]<<" token."<<std::endl;
 	exit(errCode);
 }

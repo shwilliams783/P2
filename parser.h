@@ -4,6 +4,12 @@
 #include "token.h"
 #include "node.h"
 
+static std::string tokNames[33] = {"IntTK", "IDTK", "stopTK", "iterTK", "voidTK", "varTK", "returnTK",
+"startTK", "readTK", "programTK", "printTK", "iffTK", "thenTK", "letTK",  "=TK",
+">TK",	"<TK",	":TK",	"+TK",	"-TK",	"*TK",
+"/TK",	"\%TK",	".TK", "(TK", ")TK", ",TK",
+"{TK", "}TK", ";TK", "[TK", "]TK", "EOFTK"};
+
 /* Function prototypes */
 node_t* parser();
 node_t* program();

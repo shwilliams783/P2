@@ -17,7 +17,9 @@ void inputValidation(int, char**);
 
 /* main() validates user command line input for selecting input files to be
    scanned into tokens by parser(), which will produce a parse tree for the
-   back end.
+   back end. After parser() makes the parse tree, traversePreorder() prints
+   the node types and any stored tokens, indented 2 spaces per depth in the
+   tree.
 */
 int main(int argc, char* argv[])
 {
@@ -26,6 +28,7 @@ int main(int argc, char* argv[])
 	inputValidation(argc, argv);
 	/* Initializes the parser */
 	root = parser();
+	/* Prints the parse tree */
 	traversePreorder(root);
 }
 
