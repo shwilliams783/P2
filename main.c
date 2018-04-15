@@ -6,6 +6,7 @@
 #include "token.h"
 #include "scanner.h"
 #include "parser.h"
+#include "node.h"
 
 static const int BUFFER = 80; 
 FILE *infp;
@@ -19,10 +20,11 @@ void inputValidation(int, char**);
 */
 int main(int argc, char* argv[])
 {
+	node_t* root = new node_t;
 	/* Validates command line arguments */
 	inputValidation(argc, argv);
 	/* Initializes the parser */
-	parser();
+	root = parser();
 	
 }
 
